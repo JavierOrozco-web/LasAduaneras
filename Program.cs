@@ -1,12 +1,12 @@
-using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔥 Agregar DbContext
+// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 🔥 CORS (para tu HTML)
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -15,22 +15,14 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
-builder.Services.AddOpenApi();
-
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 app.UseHttpsRedirection();
 
-// 🔥 activar CORS
+// activar CORS
 app.UseCors("AllowAll");
 
-
-// 🔥 Endpoint REAL desde BD
+// Endpoints
 app.MapGet("/productos", async (AppDbContext db) =>
 {
     return await db.Productos.ToListAsync();
