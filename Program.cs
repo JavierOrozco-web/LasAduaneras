@@ -18,8 +18,6 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-
-// activar CORS
 app.UseCors("AllowAll");
 
 // Endpoints
