@@ -26,8 +26,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// activar CORS
 app.UseCors("AllowAll");
 
 // 🧪 TEST (sin base de datos)
