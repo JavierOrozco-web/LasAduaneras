@@ -40,9 +40,14 @@ app.UseCors("AllowAll");
 app.MapGet("/test", () => "Funciona");
 
 // Endpoints
-app.MapGet("/productos", async (AppDbContext db) =>
+app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
 {
-    return await db.Productos.ToListAsync();
+    var query = db.Productos.AsQueryable();
+
+    if (categoriaID != null)
+        query = query.Where(p => p.CategoriaID == categoriaID);
+
+    return await query.ToListAsync();
 });
 
 app.MapGet("/categorias", async (AppDbContext db) =>
