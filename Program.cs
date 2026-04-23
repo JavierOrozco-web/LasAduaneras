@@ -2,6 +2,9 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -16,6 +19,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/error");
+}
 
 app.UseHttpsRedirection();
 
@@ -34,6 +42,11 @@ app.MapGet("/productos", async (AppDbContext db) =>
 app.MapGet("/categorias", async (AppDbContext db) =>
 {
     return await db.Categorias.ToListAsync();
+});
+
+app.MapGet("/error", () =>
+{
+    return Results.Problem("Ocurrió un error en el servidor");
 });
 
 app.Run();
