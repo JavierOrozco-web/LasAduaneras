@@ -9,9 +9,17 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Producto>()
-            .Property(p => p.Precio)
-            .HasPrecision(10, 2); // 👈 aquí defines el decimal
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            var properties = entity.GetProperties()
+                .Where(p => p.ClrType == typeof(decimal));
+
+            foreach (var property in properties)
+            {
+                property.SetPrecision(10);
+                property.SetScale(2);
+            }
+        }
 
         base.OnModelCreating(modelBuilder);
     }
