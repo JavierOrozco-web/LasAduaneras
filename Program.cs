@@ -50,28 +50,27 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
     return await query.ToListAsync();
 });
 
-app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
+app.MapGet("/productos-especiales", async (int? categoriaID, AppDbContext db) =>
 {
     var query = db.Productos.AsQueryable();
 
-    // 1. Aplicamos el filtro de categoría si existe
+    // 1. Aplicamos el filtro de categoría si existe (opcional en la URL)
     if (categoriaID != null)
     {
         query = query.Where(p => p.CategoriaID == categoriaID);
     }
 
-    // 2. Seleccionamos SOLO lo necesario (C# crea el JSON con estos nombres)
+    // 2. Seleccionamos SOLO lo necesario para que el JSON sea ligero
     var resultado = await query
         .Select(p => new 
         {
-            p.NombreProducto, // Asegúrate que se llame así en tu clase C#
+            p.NombreProducto,
             p.Precio
         })
         .ToListAsync();
 
     return resultado;
 });
-
 app.MapGet("/categorias", async (AppDbContext db) =>
 {
     return await db.Categorias.ToListAsync();
