@@ -50,6 +50,19 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
     return await query.ToListAsync();
 });
 
+app.MapGet("/productos-especiales", async (AppDbContext db) =>
+{
+    // Aquí escribes TU consulta especial
+    var querySql = @"
+        SELECT P.ProductoID, P.NombreProducto, P.Precio FROM Productos as P INNER JOIN Categorias AS C on P.CategoriaID = C.CategoriaID";
+
+    var productos = await db.Productos
+        .FromSqlRaw(querySql)
+        .ToListAsync();
+
+    return productos;
+});
+
 app.MapGet("/categorias", async (AppDbContext db) =>
 {
     return await db.Categorias.ToListAsync();
