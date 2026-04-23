@@ -22,6 +22,9 @@ app.UseHttpsRedirection();
 // activar CORS
 app.UseCors("AllowAll");
 
+// 🧪 TEST (sin base de datos)
+app.MapGet("/test", () => "Funciona");
+
 // Endpoints
 app.MapGet("/productos", async (AppDbContext db) =>
 {
