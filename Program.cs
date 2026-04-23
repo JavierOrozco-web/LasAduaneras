@@ -50,6 +50,11 @@ app.MapGet("/categorias", async (AppDbContext db) =>
     return await db.Categorias.ToListAsync();
 });
 
+app.MapGet("/clientes", async (AppDbContext db) =>
+{
+    return await db.Clientes.ToListAsync();
+});
+
 app.MapGet("/error", () =>
 {
     return Results.Problem("Ocurrió un error en el servidor");
