@@ -50,17 +50,26 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
     return await query.ToListAsync();
 });
 
-app.MapGet("/productos-especiales", async (AppDbContext db) =>
+app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
 {
-    // Aquí escribes TU consulta especial
-    var querySql = @"
-        SELECT P.ProductoID, P.NombreProducto, P.Precio FROM Productos as P INNER JOIN Categorias AS C on P.CategoriaID = C.CategoriaID";
+    var query = db.Productos.AsQueryable();
 
-    var productos = await db.Productos
-        .FromSqlRaw(querySql)
+    // 1. Aplicamos el filtro de categoría si existe
+    if (categoriaID != null)
+    {
+        query = query.Where(p => p.CategoriaID == categoriaID);
+    }
+
+    // 2. Seleccionamos SOLO lo necesario (C# crea el JSON con estos nombres)
+    var resultado = await query
+        .Select(p => new 
+        {
+            p.NombreProducto, // Asegúrate que se llame así en tu clase C#
+            p.Precio
+        })
         .ToListAsync();
 
-    return productos;
+    return resultado;
 });
 
 app.MapGet("/categorias", async (AppDbContext db) =>
