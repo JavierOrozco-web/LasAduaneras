@@ -39,18 +39,7 @@ app.UseCors("AllowAll");
 // 🧪 TEST (sin base de datos)
 app.MapGet("/test", () => "Funciona");
 
-// Endpoints
 app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
-{
-    var query = db.Productos.AsQueryable();
-
-    if (categoriaID != null)
-        query = query.Where(p => p.CategoriaID == categoriaID);
-
-    return await query.ToListAsync();
-});
-
-app.MapGet("/productos-especiales", async (int? categoriaID, AppDbContext db) =>
 {
     var query = db.Productos.AsQueryable();
 
@@ -64,6 +53,7 @@ app.MapGet("/productos-especiales", async (int? categoriaID, AppDbContext db) =>
     var resultado = await query
         .Select(p => new 
         {
+            p.ProductoID
             p.NombreProducto,
             p.Precio
         })
