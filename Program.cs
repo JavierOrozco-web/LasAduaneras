@@ -53,7 +53,7 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
     var resultado = await query
         .Select(p => new 
         {
-            p.ProductoID
+            p.ProductoID,
             p.NombreProducto,
             p.Precio
         })
