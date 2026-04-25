@@ -7,8 +7,8 @@ public class AppDbContext : DbContext
     public DbSet<Producto> Productos { get; set; }
     public DbSet<Categorias> Categorias { get; set; }
     public DbSet<Cliente> Clientes { get; set; }
-    public DbSet<Empleado> Empleados { get; set; }
-    
+    public DbSet<Empleados> Empleados { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
