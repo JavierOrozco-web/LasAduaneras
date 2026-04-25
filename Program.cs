@@ -39,6 +39,11 @@ app.UseCors("AllowAll");
 // 🧪 TEST (sin base de datos)
 app.MapGet("/test", () => "Funciona");
 
+app.MapGet("/cliente/{id}", async (int id, AppDbContext db) =>
+{
+    return await db.Clientes.FindAsync(id);
+});
+
 app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
 {
     var query = db.Productos.AsQueryable();
