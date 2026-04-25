@@ -68,7 +68,7 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
     var cliente = await db.Clientes
         .FirstOrDefaultAsync(u => 
             u.Correo == req.Correo && 
-            u.Password == req.Password);
+            u.Contrasena == req.Password);
 
     if (cliente != null)
     {
@@ -84,7 +84,7 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
     var empleado = await db.Empleados
         .FirstOrDefaultAsync(u => 
             u.Correo == req.Correo && 
-            u.Password == req.Password);
+            u.Contrasena == req.Password);
 
     if (empleado != null)
     {
