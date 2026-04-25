@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-public class Cliente
+public class Empleados
 {
     [Key]
     public string EmpleadoID { get; set; }
