@@ -39,9 +39,16 @@ app.UseCors("AllowAll");
 // 🧪 TEST (sin base de datos)
 app.MapGet("/test", () => "Funciona");
 
-app.MapGet("/cliente/{id}", async (int id, AppDbContext db) =>
+app.MapGet("/cliente/{id}", async (string id, AppDbContext db) =>
 {
-    return await db.Clientes.FindAsync(id);
+    var cliente = await db.Clientes.FindAsync(id);
+    return cliente is not null ? Results.Ok(cliente) : Results.NotFound();
+});
+
+app.MapGet("/empleado/{id}", async (string id, AppDbContext db) =>
+{
+    var empleado = await db.Empleados.FindAsync(id);
+    return empleado is not null ? Results.Ok(empleado) : Results.NotFound();
 });
 
 app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
