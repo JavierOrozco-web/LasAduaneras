@@ -92,7 +92,7 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         {
             tipo = "empleado",
             id = empleado.EmpleadoID,
-            nombre = empleado.Nombre
+            nombre = empleado.NombreCompleto
         });
     }
 
