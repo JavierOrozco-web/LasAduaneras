@@ -1,4 +1,4 @@
-    using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,6 +114,11 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
 
 app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
 {
+    var existe = await db.Clientes.AnyAsync(c => c.Correo == req.Correo);
+
+    if (existe)
+        return Results.BadRequest("El correo ya está registrado");
+
     var cliente = new Cliente
     {
         NombreCompleto = req.Nombre + " " + req.Apellidos,
