@@ -112,6 +112,23 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
     return Results.Unauthorized();
 });
 
+app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
+{
+    var cliente = new Cliente
+    {
+        NombreCompleto = req.Nombre + " " + req.Apellidos,
+        Correo = req.Correo,
+        Contrasena = req.Password,
+        Telefono = req.Telefono,
+        Direccion = req.Direccion
+    };
+
+    db.Clientes.Add(cliente);
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { mensaje = "Usuario registrado correctamente" });
+});
+
 app.MapGet("/categorias", async (AppDbContext db) =>
 {
     return await db.Categorias.ToListAsync();
