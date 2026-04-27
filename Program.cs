@@ -114,13 +114,33 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
 
 app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
 {
+    // 🔍 VALIDAR DUPLICADO
     var existe = await db.Clientes.AnyAsync(c => c.Correo == req.Correo);
-
     if (existe)
         return Results.BadRequest("El correo ya está registrado");
 
+    // 🔢 OBTENER ÚLTIMO ID
+    var ultimo = await db.Clientes
+        .OrderByDescending(c => c.ClienteID)
+        .Select(c => c.ClienteID)
+        .FirstOrDefaultAsync();
+
+    int nuevoNumero = 1;
+
+    if (ultimo != null)
+    {
+        // "CLI-005" → 5
+        var numero = int.Parse(ultimo.Split('-')[1]);
+        nuevoNumero = numero + 1;
+    }
+
+    // FORMATO: CLI-001
+    string nuevoID = $"CLI-{nuevoNumero.ToString("D3")}";
+
+    // 🧱 CREAR CLIENTE
     var cliente = new Cliente
     {
+        ClienteID = nuevoID,
         NombreCompleto = req.Nombre + " " + req.Apellidos,
         Correo = req.Correo,
         Contrasena = req.Password,
@@ -131,7 +151,7 @@ app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
     db.Clientes.Add(cliente);
     await db.SaveChangesAsync();
 
-    return Results.Ok(new { mensaje = "Usuario registrado correctamente" });
+    return Results.Ok(new { id = nuevoID });
 });
 
 app.MapGet("/categorias", async (AppDbContext db) =>
