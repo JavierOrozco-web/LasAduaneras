@@ -46,6 +46,30 @@ app.MapGet("/cliente/{id}", async (string id, AppDbContext db) =>
     return cliente is not null ? Results.Ok(cliente) : Results.NotFound();
 });
 
+app.MapPut("/cliente/editar", async (ClienteUpdateRequest req, AppDbContext db) =>
+{
+    var cliente = await db.Clientes.FindAsync(req.ClienteID);
+
+    if (cliente == null)
+        return Results.NotFound("Cliente no encontrado");
+
+    cliente.Nombre = req.Nombre;
+    cliente.Apellidos = req.Apellidos;
+    cliente.Telefono = req.Telefono;
+    cliente.Direccion = req.Direccion;
+    cliente.Correo = req.Correo;
+
+    // 🔥 solo si viene contraseña
+    if (!string.IsNullOrEmpty(req.Password))
+    {
+        cliente.Contrasena = req.Password;
+    }
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { mensaje = "Actualizado correctamente" });
+});
+
 app.MapGet("/empleado/{id}", async (string id, AppDbContext db) =>
 {
     var empleado = await db.Empleados.FindAsync(id);
@@ -89,7 +113,7 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         {
             tipo = "cliente",
             id = cliente.ClienteID,
-            nombre = cliente.NombreCompleto
+            nombre = cliente.Nombre + cliente.Apellidos
         });
     }
 
@@ -105,7 +129,7 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         {
             tipo = "empleado",
             id = empleado.EmpleadoID,
-            nombre = empleado.NombreCompleto
+            nombre = empleado.Nombre + empleado.Apellidos
         });
     }
 
@@ -142,7 +166,8 @@ app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
     var cliente = new Cliente
     {
         ClienteID = nuevoID,
-        NombreCompleto = req.Nombre + " " + req.Apellidos,
+        Nombre = req.Nombre,
+        Apellidos = req.Apellidos,
         Correo = req.Correo,
         Contrasena = req.Password,
         Telefono = req.Telefono,
