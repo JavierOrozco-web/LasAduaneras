@@ -13,7 +13,7 @@ namespace LasAduaneras.Models
 
     public class ProductoRequest
     {
-        public int ProductoID { get; set; }
+        public string ProductoID { get; set; }
         public int Cantidad { get; set; }
         public decimal Precio { get; set; }
     }
