@@ -184,6 +184,31 @@ app.MapPost("/pedido", async (PedidoRequest req, AppDbContext db) =>
     return Results.Ok(new { mensaje = "Pedido creado" });
 });
 
+app.MapGet("/historial/{clienteID}", async (string clienteID, AppDbContext db) =>
+{
+    var pedidos = await db.Pedidos
+        .Where(p => p.ClienteID == clienteID)
+        .OrderByDescending(p => p.Fecha)
+        .Select(p => new
+        {
+            p.PedidoID,
+            p.Fecha,
+            p.Total,
+            p.MetodoPago,
+            Productos = db.DetallePedidos
+                .Where(d => d.PedidoID == p.PedidoID)
+                .Select(d => new
+                {
+                    d.ProductoID,
+                    d.Cantidad,
+                    d.Precio
+                }).ToList()
+        })
+        .ToListAsync();
+
+    return Results.Ok(pedidos);
+});
+
 app.MapGet("/categorias", async (AppDbContext db) =>
 {
     return await db.Categorias.ToListAsync();
