@@ -109,11 +109,15 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
 
     if (cliente != null)
     {
-        return Results.Ok(new
-        {
+        return Results.Ok(new {
             tipo = "cliente",
             id = cliente.ClienteID,
-            nombre = cliente.Nombre + cliente.Apellidos
+            nombre = cliente.Nombre,
+            apellidos = cliente.Apellidos,
+            telefono = cliente.Telefono,
+            direccion = cliente.Direccion,
+            correo = cliente.Correo,
+            contrasena = cliente.Contrasena
         });
     }
 
@@ -129,7 +133,11 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         {
             tipo = "empleado",
             id = empleado.EmpleadoID,
-            nombre = empleado.Nombre + empleado.Apellidos
+            nombre = empleado.Nombre,
+            apellidos = empleado.Apellidos,
+            puesto = empleado.Puesto,
+            correo = empleado.Correo,
+            contrasena = empleado.Contrasena
         });
     }
 
