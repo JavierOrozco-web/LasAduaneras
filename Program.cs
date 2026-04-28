@@ -188,22 +188,28 @@ app.MapGet("/historial/{clienteID}", async (string clienteID, AppDbContext db) =
 {
     var pedidos = await db.Pedidos
         .Where(p => p.ClienteID == clienteID)
-        .OrderByDescending(p => p.Fecha)
         .Select(p => new
         {
             p.PedidoID,
             p.Fecha,
             p.Total,
             p.MetodoPago,
+
             Productos = db.DetallePedidos
                 .Where(d => d.PedidoID == p.PedidoID)
-                .Select(d => new
-                {
-                    d.ProductoID,
-                    d.Cantidad,
-                    d.Precio
-                }).ToList()
+                .Join(db.Productos,
+                      d => d.ProductoID,
+                      pr => pr.ProductoID,
+                      (d, pr) => new
+                      {
+                          d.ProductoID,
+                          d.Cantidad,
+                          d.Precio,
+                          pr.NombreProducto
+                      })
+                .ToList()
         })
+        .OrderByDescending(p => p.Fecha)
         .ToListAsync();
 
     return Results.Ok(pedidos);
