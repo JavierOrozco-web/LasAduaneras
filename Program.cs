@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using LasAduaneras.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -152,6 +153,35 @@ app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
     await db.SaveChangesAsync();
 
     return Results.Ok(new { id = nuevoID });
+});
+
+app.MapPost("/pedido", async (PedidoRequest req, AppDbContext db) =>
+{
+    var pedido = new Pedido
+    {
+        ClienteID = req.ClienteID,
+        Fecha = DateTime.Now,
+        Total = req.Total,
+        MetodoPago = req.MetodoPago
+    };
+
+    db.Pedidos.Add(pedido);
+    await db.SaveChangesAsync();
+
+    foreach (var item in req.Productos)
+    {
+        db.DetallePedidos.Add(new DetallePedido
+        {
+            PedidoID = pedido.PedidoID,
+            ProductoID = item.ProductoID,
+            Cantidad = item.Cantidad,
+            Precio = item.Precio
+        });
+    }
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { mensaje = "Pedido creado" });
 });
 
 app.MapGet("/categorias", async (AppDbContext db) =>
