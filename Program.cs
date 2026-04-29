@@ -193,7 +193,7 @@ app.MapPost("/pedido", async (PedidoRequest req, AppDbContext db) =>
     var pedido = new Pedido
     {
         ClienteID = req.ClienteID,
-        Fecha = DateTime.Now,
+        Fecha = DateTime.UtcNow,
         Total = req.Total,
         MetodoPago = req.MetodoPago
     };
