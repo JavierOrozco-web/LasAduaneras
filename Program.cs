@@ -99,6 +99,20 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
     return resultado;
 });
 
+app.MapGet("/productos/buscar", async (string nombre, AppDbContext db) =>
+{
+    var productos = await db.Productos
+        .Where(p => p.NombreProducto.Contains(nombre))
+        .Select(p => new {
+            p.ProductoID,
+            p.NombreProducto,
+            p.Precio
+        })
+        .ToListAsync();
+
+    return Results.Ok(productos);
+});
+
 app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
 {
     // 🔍 Buscar en CLIENTES
