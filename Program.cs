@@ -46,28 +46,43 @@ app.MapGet("/cliente/{id}", async (string id, AppDbContext db) =>
     return cliente is not null ? Results.Ok(cliente) : Results.NotFound();
 });
 
-app.MapPut("/cliente/editar", async (ClienteUpdateRequest req, AppDbContext db) =>
+app.MapPut("/usuario/editar", async (ClienteUpdateRequest req, AppDbContext db) =>
 {
+    // 🔍 buscar cliente
     var cliente = await db.Clientes.FindAsync(req.ClienteID);
 
-    if (cliente == null)
-        return Results.NotFound("Cliente no encontrado");
-
-    cliente.Nombre = req.Nombre;
-    cliente.Apellidos = req.Apellidos;
-    cliente.Telefono = req.Telefono;
-    cliente.Direccion = req.Direccion;
-    cliente.Correo = req.Correo;
-
-    // 🔥 solo si viene contraseña
-    if (!string.IsNullOrEmpty(req.Password))
+    if (cliente != null)
     {
-        cliente.Contrasena = req.Password;
+        cliente.Nombre = req.Nombre;
+        cliente.Apellidos = req.Apellidos;
+        cliente.Telefono = req.Telefono;
+        cliente.Direccion = req.Direccion;
+        cliente.Correo = req.Correo;
+
+        if (!string.IsNullOrEmpty(req.Password))
+            cliente.Contrasena = req.Password;
+
+        await db.SaveChangesAsync();
+        return Results.Ok(new { mensaje = "Cliente actualizado" });
     }
 
-    await db.SaveChangesAsync();
+    // 🔍 buscar empleado
+    var empleado = await db.Empleados.FindAsync(req.ClienteID);
 
-    return Results.Ok(new { mensaje = "Actualizado correctamente" });
+    if (empleado != null)
+    {
+        empleado.Nombre = req.Nombre;
+        empleado.Apellidos = req.Apellidos;
+        empleado.Correo = req.Correo;
+
+        if (!string.IsNullOrEmpty(req.Password))
+            empleado.Contrasena = req.Password;
+
+        await db.SaveChangesAsync();
+        return Results.Ok(new { mensaje = "Empleado actualizado" });
+    }
+
+    return Results.NotFound("Usuario no encontrado");
 });
 
 app.MapPost("/verificar-password", async (VerificarPasswordRequest req, AppDbContext db) =>
