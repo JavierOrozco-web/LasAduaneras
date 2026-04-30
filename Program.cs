@@ -70,6 +70,23 @@ app.MapPut("/cliente/editar", async (ClienteUpdateRequest req, AppDbContext db) 
     return Results.Ok(new { mensaje = "Actualizado correctamente" });
 });
 
+app.MapPost("/verificar-password", async (VerificarPasswordRequest req, AppDbContext db) =>
+{
+    var usuario = await db.Clientes
+        .FirstOrDefaultAsync(u => u.ClienteID == req.Id && u.Contrasena == req.Password);
+
+    if (usuario == null)
+    {
+        var empleado = await db.Empleados
+            .FirstOrDefaultAsync(u => u.EmpleadoID == req.Id && u.Contrasena == req.Password);
+
+        if (empleado == null)
+            return Results.Unauthorized();
+    }
+
+    return Results.Ok();
+});
+
 app.MapGet("/empleado/{id}", async (string id, AppDbContext db) =>
 {
     var empleado = await db.Empleados.FindAsync(id);
