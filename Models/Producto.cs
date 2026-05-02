@@ -9,4 +9,5 @@ public class Producto
     public decimal Precio { get; set; }
     public string ProveedorSugerido { get; set; }
     public int CategoriaID { get; set; }
+    public int Stock { get; set; }
 }

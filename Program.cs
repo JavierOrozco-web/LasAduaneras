@@ -117,7 +117,8 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
         {
             p.ProductoID,
             p.NombreProducto,
-            p.Precio
+            p.Precio,
+            p.Stock
         })
         .ToListAsync();
 
