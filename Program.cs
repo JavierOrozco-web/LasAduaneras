@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-// DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -18,7 +17,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
                 errorNumbersToAdd: null);
         }));
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -37,7 +35,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
-// 🧪 TEST (sin base de datos)
 app.MapGet("/test", () => "Funciona");
 
 app.MapGet("/cliente/{id}", async (string id, AppDbContext db) =>
@@ -48,7 +45,6 @@ app.MapGet("/cliente/{id}", async (string id, AppDbContext db) =>
 
 app.MapPut("/usuario/editar", async (ClienteUpdateRequest req, AppDbContext db) =>
 {
-    // 🔍 buscar cliente
     var cliente = await db.Clientes.FindAsync(req.ClienteID);
 
     if (cliente != null)
@@ -66,7 +62,6 @@ app.MapPut("/usuario/editar", async (ClienteUpdateRequest req, AppDbContext db) 
         return Results.Ok(new { mensaje = "Cliente actualizado" });
     }
 
-    // 🔍 buscar empleado
     var empleado = await db.Empleados.FindAsync(req.ClienteID);
 
     if (empleado != null)
@@ -112,13 +107,11 @@ app.MapGet("/productos", async (int? categoriaID, AppDbContext db) =>
 {
     var query = db.Productos.AsQueryable();
 
-    // 1. Aplicamos el filtro de categoría si existe (opcional en la URL)
     if (categoriaID != null)
     {
         query = query.Where(p => p.CategoriaID == categoriaID);
     }
 
-    // 2. Seleccionamos SOLO lo necesario para que el JSON sea ligero
     var resultado = await query
         .Select(p => new 
         {
@@ -147,7 +140,6 @@ app.MapGet("/productos/buscar", async (string nombre, AppDbContext db) =>
 
 app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
 {
-    // 🔍 Buscar en CLIENTES
     var cliente = await db.Clientes
         .FirstOrDefaultAsync(u => 
             u.Correo == req.Correo && 
@@ -167,7 +159,6 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         });
     }
 
-    // 🔍 Buscar en EMPLEADOS
     var empleado = await db.Empleados
         .FirstOrDefaultAsync(u => 
             u.Correo == req.Correo && 
@@ -187,18 +178,15 @@ app.MapPost("/login", async (LoginRequest req, AppDbContext db) =>
         });
     }
 
-    // ❌ No encontrado
     return Results.Unauthorized();
 });
 
 app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
 {
-    // 🔍 VALIDAR DUPLICADO
     var existe = await db.Clientes.AnyAsync(c => c.Correo == req.Correo);
     if (existe)
         return Results.BadRequest("El correo ya está registrado");
 
-    // 🔢 OBTENER ÚLTIMO ID
     var ultimo = await db.Clientes
         .OrderByDescending(c => c.ClienteID)
         .Select(c => c.ClienteID)
@@ -208,15 +196,12 @@ app.MapPost("/registro", async (RegistroRequest req, AppDbContext db) =>
 
     if (ultimo != null)
     {
-        // "CLI-005" → 5
         var numero = int.Parse(ultimo.Split('-')[1]);
         nuevoNumero = numero + 1;
     }
 
-    // FORMATO: CLI-001
     string nuevoID = $"CLI-{nuevoNumero.ToString("D3")}";
 
-    // 🧱 CREAR CLIENTE
     var cliente = new Cliente
     {
         ClienteID = nuevoID,
